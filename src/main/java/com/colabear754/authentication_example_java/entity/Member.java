@@ -22,9 +22,13 @@ public class Member {
     private String password;
     private String name;
     private Integer age;
+
     @Enumerated(EnumType.STRING)
     private MemberType type;
+
     private LocalDateTime createdAt;
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
