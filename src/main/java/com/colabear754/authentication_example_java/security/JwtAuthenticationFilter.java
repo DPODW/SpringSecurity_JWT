@@ -32,13 +32,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override //OncePerRequestFilter 사용시 꼭 재정의 해야하는 doFilterInternal 메소드
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = parseBearerToken(request);
-        User user = parseUserSpecification(token);
+        String token = parseBearerToken(request); //요청 토큰의 실질적인 값을 추출하기 위해 parseBearer 메소드에 요청(request) 를 넣는다
+        User user = parseUserSpecification(token); //실질적 토큰 값을 검사, 복호화 한 값을 얻기 위해 parseUserSpecification 메소드에 위에서 얻은 토큰을 넣는다
         AbstractAuthenticationToken authenticated = UsernamePasswordAuthenticationToken.authenticated(user, token, user.getAuthorities());
+        //UsernamePasswordAuthenticationToken 에 주어진 인자를 사용하여 인증된 사용자 객체를 생성,반환하는 메소드인 authenticated 를 사용하고, 매개값으로 user,token, 권한을 넣는다.
+        //AbstractAuthenticationToken(추상 클래스)는 UsernamePasswordAuthenticationToken 의 상위 클래스로, 구현 시 필요하다.
+        //현재 -> 인증된 사용자 토큰이 발급 되었다.
+
         authenticated.setDetails(new WebAuthenticationDetails(request));
+        //authenticated.setDetails: 인증된 사용자 객체에 세부 정보를 설정하는 메소드.
+        //WebAuthenticationDetails: HTTP 요청에 대한 세부 정보를 저장하는 메소드
+        //-> 위에서 생성된 인증된 사용자 객체(토큰) 에 요청(request) 의 세부적인 정보(WebAuthenticationDetails) 를 저장한다.
+
         SecurityContextHolder.getContext().setAuthentication(authenticated);
+        //SecurityContextHolder 클래스의 getContext() 를 호출하여, 현재 실행 중인 스레드의 SecurityContext 객체를 가져온다. (사용자 정보가 최종적으로 저장되는 . . )
+        //SecurityContext 객체의 setAuthentication 메소드를 호출하여, 인증 사용자를 설정한다. -> 인증 사용자는 우리가 위에서 만든 authenticated 이다.
+        //최종적으로 사용자의 정보가 SecurityContext 에 담기게 되었다.
 
         filterChain.doFilter(request, response);
+        //요청과 응답을 다음 필터로 넘긴다. . .
     }
 /**
  * bearer -> 토큰을 사용하는 방식 (어떻게 토큰을 사용할 것인지)

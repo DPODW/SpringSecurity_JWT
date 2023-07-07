@@ -36,7 +36,7 @@ public class SignService {
         Member member = memberRepository.findByAccount(request.account())
                 .filter(it -> encoder.matches(request.password(), it.getPassword())) //it == member(it 에 사용자 정보가 들어있는 거임)
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다..."));
-        String token = tokenProvider.createToken(String.format("%s:%s", member.getId(), member.getType()));	// 토큰 생성
+        String token = tokenProvider.createToken(String.format("%s:%s", member.getId(), member.getType()));	// 토큰 생성 , String.format("%s:%s") -> 문자열 수정
         return new SignInResponse(member.getName(), member.getType(),token);
     }
 }
